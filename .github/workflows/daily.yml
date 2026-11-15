@@ -36,13 +36,7 @@ jobs:
         run: |
           mkdir -p assets/bgm assets/footage/ai_tools assets/footage/psychology assets/cartoons/cc0
       - name: Run AI Tools pipeline
-        run: |
-          python -c "
-import asyncio
-from src.pipeline import run_niche
-result = asyncio.run(run_niche('ai_tools'))
-exit(0 if result else 1)
-          "
+        run: python -c "import asyncio; from src.pipeline import run_niche; result = asyncio.run(run_niche('ai_tools')); exit(0 if result else 1)"
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -66,13 +60,7 @@ exit(0 if result else 1)
         run: |
           mkdir -p assets/bgm assets/footage/ai_tools assets/footage/psychology assets/cartoons/cc0
       - name: Run Psychology pipeline
-        run: |
-          python -c "
-import asyncio
-from src.pipeline import run_niche
-result = asyncio.run(run_niche('psychology'))
-exit(0 if result else 1)
-          "
+        run: python -c "import asyncio; from src.pipeline import run_niche; result = asyncio.run(run_niche('psychology')); exit(0 if result else 1)"
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
