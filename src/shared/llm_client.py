@@ -11,7 +11,7 @@ class LLMClient:
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not set. Add to GitHub Secrets.")
         self.client = Groq(api_key=self.api_key)
-        self.model = "llama3-8b-8192"
+        self.model = "llama-3.1-8b-instant"
 
     def generate(self, system: str, user: str, temperature: float = 0.7, max_tokens: int = 1500) -> str:
         response = self.client.chat.completions.create(
