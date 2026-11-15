@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import os
 import random
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 from src.config import CONFIG
 
 class ThumbnailMaker:
