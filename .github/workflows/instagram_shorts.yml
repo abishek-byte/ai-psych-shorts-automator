@@ -1,0 +1,50 @@
+name: Instagram to Shorts
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: 'Instagram Reel URLs (one per line)'
+        required: true
+        type: string
+
+env:
+  YOUTUBE_CLIENT_SECRETS: ${{ secrets.YOUTUBE_CLIENT_SECRETS }}
+  YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+      - name: Create token file
+        run: |
+          echo '${{ secrets.YOUTUBE_TOKEN }}' > token.json
+          echo '${{ secrets.YOUTUBE_CLIENT_SECRETS }}' > client_secrets.json
+      - name: Process Instagram Reels
+        run: |
+          python -c "
+import asyncio
+import os
+import sys
+
+# Read URLs from input
+urls = '''${{ github.event.inputs.urls }}'''.strip().split()
+if not urls or urls == ['']:
+    print('No URLs provided')
+    sys.exit(1)
+
+# Patch the script to use provided URLs
+import instagram_to_shorts
+instagram_to_shorts.INSTAGRAM_URLS = urls
+
+asyncio.run(instagram_to_shorts.main())
+          "
