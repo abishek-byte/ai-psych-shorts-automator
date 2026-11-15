@@ -69,7 +69,7 @@ class Config:
             self.clip_duration_range = [3, 8]
 
 def load_config() -> Config:
-    config_path = Path(__file__).parent.parent.parent / "config.yaml"
+    config_path = Path(__file__).parent.parent / "config.yaml"
     cfg = Config()
 
     if config_path.exists():
