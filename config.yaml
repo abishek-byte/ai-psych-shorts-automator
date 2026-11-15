@@ -1,0 +1,75 @@
+# ============ API KEYS (set as GitHub Secrets) ============
+# GROQ_API_KEY: "gsk_..."
+# PIXABAY_API_KEY: "your_pixabay_key"
+# YOUTUBE_CLIENT_SECRETS: (JSON string from Google Cloud)
+# YOUTUBE_TOKEN: (JSON string from first auth run)
+
+# ============ CHANNEL SETTINGS ============
+channel:
+  name: "Your Channel Name"
+  description: "Daily AI tools & Psychology insights"
+  default_tags: ["shorts", "ai", "psychology", "productivity", "selfimprovement"]
+  category_id: "27"
+  language: "en"
+  privacy_status: "public"
+
+# ============ NICHE CONFIGURATION ============
+niches:
+  ai_tools:
+    enabled: true
+    schedule: "0 10 * * *"
+    max_duration_seconds: 55
+    upload_time: "10:30"
+    prompt_style: "tutorial"
+    target_tools_per_week: 5
+
+  psychology:
+    enabled: true
+    schedule: "0 16 * * *"
+    max_duration_seconds: 50
+    upload_time: "16:30"
+    prompt_style: "fact"
+    categories: ["cognitive_bias", "habits", "decision_making", "social", "memory", "productivity"]
+
+# ============ PRODUCTION SETTINGS ============
+production:
+  video:
+    width: 1080
+    height: 1920
+    fps: 30
+    crf: 23
+    preset: "fast"
+    font_size: 72
+    font_color: "white"
+    stroke_color: "black"
+    stroke_width: 3
+    safe_zone_margin: 150
+
+  audio:
+    tts_voice: "en-US-AriaNeural"
+    tts_rate: "+5%"
+    tts_volume: "+0%"
+    bgm_volume: 0.12
+    bgm_tracks: ["assets/bgm/upbeat.mp3", "assets/bgm/calm.mp3"]
+
+  footage:
+    min_clips: 3
+    max_clips: 6
+    clip_duration_range: [3, 8]
+    orientation: "vertical"
+    min_width: 1080
+    use_local_fallback: true
+
+  thumbnail:
+    width: 1280
+    height: 720
+    title_font_size: 80
+    subtitle_font_size: 48
+    background_style: "gradient"
+
+# ============ UPLOAD SETTINGS ============
+upload:
+  max_per_day: 2
+  shorts_hashtag: "#Shorts"
+  add_to_shorts_shelf: true
+  notify_subscribers: false

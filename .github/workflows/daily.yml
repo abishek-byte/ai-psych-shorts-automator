@@ -1,0 +1,100 @@
+name: Daily Shorts Generator
+
+on:
+  schedule:
+    - cron: '0 10 * * *'
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      niche:
+        description: 'Niche to run'
+        required: true
+        type: choice
+        options: [ai_tools, psychology, both]
+
+env:
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  PIXABAY_API_KEY: ${{
+  YOUTUBE_CLIENT_SECRETS: ${{ secrets.YOUTUBE_CLIENT_SECRETS }}
+  YOUTUBE_TOKEN: ${{ s
+
+jobs:
+  generate-ai-tools:
+    if: github.event_nvent.schedule == '0 10* * *' || github.event.inputs.niche == 'ai_tools' ||
+github.event.inputs.ni
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: |
+          sudo apt-getll -y ffmpeg
+          pip install -r requirements.txt
+      - name: Prepare
+        run: |
+          mkdir -p asslsassets/footage/psychology assets/cartoons/cc0
+      - name: Run AI T
+        run: |
+          python -c "
+          import asyncio
+          from src.pip
+          result = asyncio.run(run_niche('ai_tools'))
+          exit(0 if re
+          "
+      - uses: actions/
+        if: failure()
+        with:
+          name: ai-tools-logs
+          path: work/a
+
+  generate-psychology:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 16
+* * *' || github.event ||github.event.inputs.niche == 'both'
+    runs-on: ubuntu-la
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/
+        with:
+          python-versi
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install
+      - name: Prepare assets
+        run: |
+          mkdir -p assets/bgm assets/footage/ai_tools
+assets/footage/psychol
+      - name: Run Psychology pipeline
+        run: |
+          python -c "
+          import async
+          from src.pipeline import run_niche
+          result = asyy'))
+          exit(0 if result else 1)
+          "
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: psycho
+          path: work/psychology_*/
+
+  notify-failure:
+    if: failure()
+    needs: [generate-ai-tools, generate-psychology]
+    runs-on: ubuntu-la
+    steps:
+      - uses: actions/
+        with:
+          script: |
+            await github.rest.issues.create({
+
+              owner: c
+              repo: context.repo.repo,
+              title: `
+              body: `Workflow failed at ${new Date().toISOString()}\nCheck Actions tab for logs.`
+              labels: ['automation', 'failure']
+            });
