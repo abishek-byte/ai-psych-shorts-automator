@@ -8,13 +8,14 @@ from src.config import CONFIG
 
 class LLMClient:
     # Ordered list of models to try (most preferred first)
+    # Updated for current Groq free tier (as of 2025)
     FALLBACK_MODELS = [
         "llama-3.1-8b-instant",
         "llama-3.3-70b-versatile",
+        "meta-llama/llama-3.1-8b-instruct",
+        "meta-llama/llama-3.3-70b-instruct",
         "qwen-2.5-32b",
         "deepseek-r1-distill-llama-70b",
-        "mixtral-8x7b-32768",
-        "gemma2-9b-it",
     ]
 
     def __init__(self, api_key: Optional[str] = None):
