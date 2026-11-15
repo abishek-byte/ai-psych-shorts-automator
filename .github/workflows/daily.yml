@@ -2,8 +2,8 @@ name: Daily Shorts Generator
 
 on:
   schedule:
-    - cron: '0 10 * * *'
-    - cron: '0 16 * * *'
+    - cron: '0 10 * * *'  # 10:00 UTC - AI Tools
+    - cron: '0 16 * * *'  # 16:00 UTC - Psychology
   workflow_dispatch:
     inputs:
       niche:
@@ -14,87 +14,83 @@ on:
 
 env:
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-  PIXABAY_API_KEY: ${{
+  PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
   YOUTUBE_CLIENT_SECRETS: ${{ secrets.YOUTUBE_CLIENT_SECRETS }}
-  YOUTUBE_TOKEN: ${{ s
+  YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
 
 jobs:
   generate-ai-tools:
-    if: github.event_nvent.schedule == '0 10* * *' || github.event.inputs.niche == 'ai_tools' ||
-github.event.inputs.ni
+    if: github.event_name == 'schedule' && github.event.schedule == '0 10 * * *' || github.event.inputs.niche == 'ai_tools' || github.event.inputs.niche == 'both'
     runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - uses: actions/
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install
-        run: |
-          sudo apt-getll -y ffmpeg
-          pip install -r requirements.txt
-      - name: Prepare
-        run: |
-          mkdir -p asslsassets/footage/psychology assets/cartoons/cc0
-      - name: Run AI T
-        run: |
-          python -c "
-          import asyncio
-          from src.pip
-          result = asyncio.run(run_niche('ai_tools'))
-          exit(0 if re
-          "
-      - uses: actions/
-        if: failure()
-        with:
-          name: ai-tools-logs
-          path: work/a
-
-  generate-psychology:
-    if: github.event_name == 'schedule' && github.event.schedule == '0 16
-* * *' || github.event ||github.event.inputs.niche == 'both'
-    runs-on: ubuntu-la
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/
+      - uses: actions/setup-python@v5
         with:
-          python-versi
+          python-version: '3.11'
       - name: Install dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg
-          pip install
+          pip install -r requirements.txt
       - name: Prepare assets
         run: |
-          mkdir -p assets/bgm assets/footage/ai_tools
-assets/footage/psychol
-      - name: Run Psychology pipeline
+          mkdir -p assets/bgm assets/footage/ai_tools assets/footage/psychology assets/cartoons/cc0
+      - name: Run AI Tools pipeline
         run: |
           python -c "
-          import async
-          from src.pipeline import run_niche
-          result = asyy'))
-          exit(0 if result else 1)
+import asyncio
+from src.pipeline import run_niche
+result = asyncio.run(run_niche('ai_tools'))
+exit(0 if result else 1)
           "
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: psycho
+          name: ai-tools-logs
+          path: work/ai_tools_*/
+
+  generate-psychology:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 16 * * *' || github.event.inputs.niche == 'psychology' || github.event.inputs.niche == 'both'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+      - name: Prepare assets
+        run: |
+          mkdir -p assets/bgm assets/footage/ai_tools assets/footage/psychology assets/cartoons/cc0
+      - name: Run Psychology pipeline
+        run: |
+          python -c "
+import asyncio
+from src.pipeline import run_niche
+result = asyncio.run(run_niche('psychology'))
+exit(0 if result else 1)
+          "
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: psychology-logs
           path: work/psychology_*/
 
   notify-failure:
     if: failure()
     needs: [generate-ai-tools, generate-psychology]
-    runs-on: ubuntu-la
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/
+      - uses: actions/github-script@v7
         with:
           script: |
             await github.rest.issues.create({
-
-              owner: c
+              owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `
-              body: `Workflow failed at ${new Date().toISOString()}\nCheck Actions tab for logs.`
+              title: `Daily Shorts failed: ${new Date().toISOString()}`,
+              body: `Workflow failed at ${new Date().toISOString()}\nCheck Actions tab for logs.`,
               labels: ['automation', 'failure']
             });
